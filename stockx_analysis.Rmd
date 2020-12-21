@@ -1,0 +1,40 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+
+sneakers = read_excel("StockX-Data-Contest-2019-3.xlsx", sheet=2)
+names(sneakers) = c("order_date", "brand", "sneaker_name", "sale_price", 
+                    "retail_price", "release_date", "shoe_size", "state")
+sneakers$state = tolower(sneakers$state)
+sneakers$time_to_sale = (sneakers$order_date - sneakers$release_date)/(60*60*24)
+sneakers = sneakers %>%
+  mutate(across(where(is.character), as.factor))
+
+```
+
+```{r}
+ggplot() +
+  geom_point(data=sneakers, aes(x=shoe_size, y=sale_price, color=brand), alpha=0.1)
+```
+
+```{r}
+library(usmap)
+
+med_sale = sneakers %>% 
+  group_by(state) %>% 
+  summarize(med_price = median(sale_price))
+
+plot_usmap(regions="states", data=med_sale, values="med_price")
+```
+
+```{r}
+
+  
+```
