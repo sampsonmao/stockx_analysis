@@ -13,15 +13,34 @@ sneakers = read_excel("StockX-Data-Contest-2019-3.xlsx", sheet=2)
 names(sneakers) = c("order_date", "brand", "sneaker_name", "sale_price", 
                     "retail_price", "release_date", "shoe_size", "state")
 sneakers$state = tolower(sneakers$state)
-sneakers$time_to_sale = (sneakers$order_date - sneakers$release_date)/(60*60*24)
+sneakers$days_to_sale = (sneakers$order_date - sneakers$release_date)/(60*60*24)
 sneakers = sneakers %>%
   mutate(across(where(is.character), as.factor))
 
 ```
 
+`days_to_sale` used for visualization purposes only. This is an example of data leakage because we won't have this information if we were to predict the sale price on new data.
+
 ```{r}
 ggplot() +
-  geom_point(data=sneakers, aes(x=shoe_size, y=sale_price, color=brand), alpha=0.1)
+  geom_point(data=sneakers, aes(x=days_to_sale, y=sale_price, color=brand), alpha=0.1)
+```
+
+```{r}
+ggplot() +
+  geom_boxplot(data=sneakers, aes(x=sneaker_name, y=sale_price, fill=brand), alpha=0.5)
+```
+
+```{r}
+ggplot() +
+  geom_histogram(data=sneakers, aes(x=sale_price),
+                 color="white", fill="lightblue") 
+ggplot() + 
+  geom_histogram(data=sneakers, aes(x=sale_price,y=..density..), 
+                colour="black", fill="white") +
+  geom_density(data=sneakers, aes(x=sale_price,y=..density..),
+                                  alpha=0.2, fill="red",
+               adjust=3) 
 ```
 
 ```{r}
